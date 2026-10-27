@@ -5,11 +5,670 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>SKYLINK | CanSat 2026 Weekly Blog</title>
   <meta name="description" content="Official weekly engineering & flight blog for Team Skylink (CanSat 2026).">
-  <!-- Fonts -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  
+  <style>
+    :root {
+      --bg: #07090e;
+      --card-bg: rgba(15, 21, 33, 0.85);
+      --card-border: rgba(0, 242, 254, 0.15);
+      --card-hover-border: rgba(0, 242, 254, 0.4);
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --cyan: #00f2fe;
+      --blue: #4facfe;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --font-main: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: var(--font-main);
+      min-height: 100vh;
+      min-height: 100dvh;
+      line-height: 1.5;
+      position: relative;
+      overflow-x: hidden;
+      padding-bottom: 50px;
+    }
+
+    /* Ambient Space Glow */
+    .stars-bg {
+      position: fixed;
+      inset: 0;
+      background-image: 
+        radial-gradient(1px 1px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(1.2px 1.2px at 50px 80px, rgba(0, 242, 254, 0.8), rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 120px 140px, rgba(255,255,255,0.7), rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 180px 50px, #4facfe, rgba(0,0,0,0));
+      background-repeat: repeat;
+      background-size: 220px 220px;
+      opacity: 0.35;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .glow-orb {
+      position: fixed;
+      width: 340px;
+      height: 340px;
+      border-radius: 50%;
+      filter: blur(100px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .orb-1 {
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: radial-gradient(circle, rgba(0, 242, 254, 0.2), transparent 70%);
+    }
+
+    .orb-2 {
+      bottom: 5%;
+      right: -80px;
+      background: radial-gradient(circle, rgba(79, 172, 254, 0.15), transparent 70%);
+    }
+
+    /* Container */
+    .container {
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 24px 18px 48px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header */
+    .profile-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .mission-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 5px 14px;
+      border-radius: 999px;
+      margin-bottom: 18px;
+    }
+
+    .live-pulse {
+      width: 8px;
+      height: 8px;
+      background: var(--emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--emerald);
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.9); opacity: 0.7; }
+      50% { transform: scale(1.3); opacity: 1; }
+      100% { transform: scale(0.9); opacity: 0.7; }
+    }
+
+    .badge-text {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      color: var(--emerald);
+      font-weight: 600;
+    }
+
+    .avatar-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .avatar-ring {
+      padding: 3px;
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      border-radius: 50%;
+      box-shadow: 0 0 25px rgba(0, 242, 254, 0.3);
+    }
+
+    .avatar-inner {
+      width: 72px;
+      height: 72px;
+      background: #0d121d;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--cyan);
+    }
+
+    .team-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      background: linear-gradient(180deg, #ffffff 40%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
+    }
+
+    .mission-subtitle {
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      color: var(--cyan);
+      margin-bottom: 8px;
+    }
+
+    .mission-bio {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      max-width: 440px;
+      margin: 0 auto 18px;
+      line-height: 1.5;
+    }
+
+    /* Stats Bar */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 12px 8px;
+      margin-bottom: 16px;
+    }
+
+    .stat-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border-right: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .stat-card:last-child {
+      border-right: none;
+    }
+
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+    }
+
+    .stat-val {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #fff;
+      margin-top: 2px;
+    }
+
+    /* Launch Countdown Clock */
+    .launch-clock-container {
+      background: rgba(12, 18, 30, 0.85);
+      border: 1px solid rgba(0, 242, 254, 0.28);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      box-shadow: 0 0 25px rgba(0, 242, 254, 0.1), inset 0 0 15px rgba(0, 242, 254, 0.04);
+      margin-bottom: 22px;
+    }
+
+    .launch-clock-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .clock-title {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: #f1f5f9;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+    }
+
+    .countdown-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .cd-block {
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 8px;
+      padding: 8px 0;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .cd-block span {
+      font-family: var(--font-mono);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--cyan);
+      display: block;
+      line-height: 1.1;
+      text-shadow: 0 0 12px rgba(0, 242, 254, 0.4);
+    }
+
+    .cd-block label {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+    }
+
+    /* Navigation Filters */
+    .filter-nav {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .filter-btn {
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      padding: 6px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+      background: rgba(0, 242, 254, 0.12);
+      border-color: var(--cyan);
+      color: #fff;
+    }
+
+    /* Timeline Cards */
+    .timeline-container {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .log-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 18px;
+      position: relative;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+    }
+
+    .log-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--card-hover-border);
+      box-shadow: 0 0 25px rgba(0, 242, 254, 0.15);
+      background: rgba(18, 26, 42, 0.9);
+    }
+
+    .log-card.upcoming {
+      opacity: 0.65;
+      border-style: dashed;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .week-tag {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--cyan);
+      background: rgba(0, 242, 254, 0.1);
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(0, 242, 254, 0.25);
+    }
+
+    .status-tag {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+
+    .status-tag.published {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--emerald);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-tag.in-progress {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--amber);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .status-tag.upcoming {
+      background: rgba(148, 163, 184, 0.1);
+      color: var(--text-dim);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+    }
+
+    .card-date {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+    }
+
+    .card-title {
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+      line-height: 1.35;
+    }
+
+    .card-thumb-wrap {
+      width: 100%;
+      height: 160px;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .card-thumb-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+
+    .log-card:hover .card-thumb-img {
+      transform: scale(1.03);
+    }
+
+    .card-summary {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .card-milestones {
+      list-style: none;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .card-milestones li {
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 5px;
+    }
+
+    .card-milestones li:last-child {
+      margin-bottom: 0;
+    }
+
+    .card-milestones li::before {
+      content: "▹";
+      color: var(--cyan);
+      font-weight: bold;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 10px;
+    }
+
+    .card-action {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--cyan);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+    }
+
+    .card-action svg {
+      transition: transform 0.2s;
+    }
+
+    .log-card:hover .card-action svg {
+      transform: translateX(4px);
+    }
+
+    /* Footer */
+    .page-footer {
+      margin-top: 36px;
+      text-align: center;
+    }
+
+    .insta-links {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .pill-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      text-decoration: none;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      padding: 9px 18px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .pill-link:hover {
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+      border-color: var(--cyan);
+    }
+
+    .pill-link.insta-btn {
+      background: rgba(225, 48, 108, 0.12);
+      border-color: rgba(225, 48, 108, 0.35);
+      color: #f43f5e;
+    }
+
+    .pill-link.insta-btn:hover {
+      background: rgba(225, 48, 108, 0.25);
+      color: #fff;
+      border-color: #f43f5e;
+    }
+
+    .copyright {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-dim);
+    }
+
+    /* Modal Viewer */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 7, 12, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #0d121e;
+      border: 1px solid rgba(0, 242, 254, 0.25);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 242, 254, 0.1);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 520px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: modalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.96) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .close-modal {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-size: 1.8rem;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0 4px;
+    }
+
+    .close-modal:hover {
+      color: #fff;
+    }
+
+    .modal-badge {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--cyan);
+      font-weight: 600;
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.3;
+    }
+
+    .modal-date {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      color: var(--text-dim);
+      display: block;
+      margin-top: 2px;
+    }
+
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      font-size: 0.92rem;
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+
+    .modal-full-img {
+      width: 100%;
+      max-height: 260px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .modal-body h4 {
+      color: var(--cyan);
+      font-size: 0.86rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      margin: 16px 0 8px;
+      letter-spacing: 0.05em;
+    }
+
+    .modal-body p {
+      margin-bottom: 12px;
+    }
+
+    .telemetry-box {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 16px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .telemetry-item {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+    }
+
+    .telemetry-item span {
+      color: var(--text-dim);
+      display: block;
+    }
+
+    .telemetry-item strong {
+      color: #fff;
+    }
+  </style>
 </head>
 <body>
 
@@ -30,7 +689,7 @@
       <div class="avatar-wrapper">
         <div class="avatar-ring">
           <div class="avatar-inner">
-            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
               <circle cx="12" cy="12" r="9"/>
               <path d="M12 3v6"/>
               <path d="M12 15v6"/>
@@ -64,11 +723,11 @@
         </div>
       </div>
 
-      <!-- Live T-Minus Launch Day Countdown -->
-      <div class="countdown-container launch-clock">
-        <div class="countdown-header">
+      <!-- Live T-Minus Launch Day Countdown Clock -->
+      <div class="launch-clock-container">
+        <div class="launch-clock-header">
           <span class="live-pulse"></span>
-          <span class="cd-title">T-MINUS TO CANSAT 2026 LAUNCH DAY (DEC 12, 2026)</span>
+          <span class="clock-title">T-MINUS TO CANSAT 2026 LAUNCH DAY (DEC 12, 2026)</span>
         </div>
         <div class="countdown-grid" id="countdownGrid">
           <div class="cd-block"><span id="days">--</span><label>DAYS</label></div>
@@ -88,7 +747,7 @@
 
     <!-- 7 Week Buttons / Cards List -->
     <main class="timeline-container" id="timelineContainer">
-      <!-- Injected by app.js -->
+      <!-- Injected by script below -->
     </main>
 
     <!-- Footer -->
@@ -128,12 +787,342 @@
       </div>
 
       <div class="modal-body" id="modalBody">
-        <!-- Rendered by app.js -->
+        <!-- Rendered dynamically -->
       </div>
     </div>
   </div>
 
-  <script src="posts.js"></script>
-  <script src="app.js"></script>
+  <!-- Bulletproof Self-Contained Engine Script -->
+  <script>
+    // Default 7-Week Mission Roadmap
+    const DEFAULT_SKYLINK_POSTS = [
+      {
+        id: 1,
+        weekNumber: 1,
+        dateRange: "Oct 25 – Oct 31, 2026",
+        status: "published",
+        title: "Mission Architecture, MCU Selection & Power Budget",
+        summary: "Official campaign kickoff! Finalized system architecture, benchmarked ESP32-S3 microcontroller, and calibrated our primary BMP388 barometric altimeter.",
+        image: "",
+        milestones: [
+          "Selected ESP32-S3 dual-core MCU (240MHz) for avionics & sensor fusion",
+          "Bench-tested BMP388 altimeter: achieved ±0.1m relative altitude accuracy",
+          "Calculated power budget: 450mAh 1S LiPo provides 3.4 hours active telemetry",
+          "Drafted primary hardware block diagram inside 66mm diameter constraint"
+        ],
+        telemetry: {
+          mcu: "ESP32-S3 (Dual-Core 240MHz)",
+          altimeter: "BMP388 Precision Barometer",
+          battery: "1S 3.7V 450mAh LiPo",
+          targetMass: "315g / 350g max"
+        },
+        fullReport: `
+          <h4>Kickoff & System Architecture</h4>
+          <p>This week marked our official kickoff for the CanSat 2026 competition! We thoroughly analyzed the competition envelope constraints (66mm diameter x 115mm height) and 350g maximum mass.</p>
+          
+          <h4>Avionics Bench Testing</h4>
+          <p>We tested our flight computer candidate, the ESP32-S3. Initial testing showed stable sensor reading intervals at 20Hz. We upgraded from the noisy BMP280 to the BMP388 barometric sensor with internal hardware IIR filtering, cutting altitude jitter down to under 12 centimeters.</p>
+
+          <h4>Next Week's Objective</h4>
+          <p>LoRa RF radio telemetry range test over 1km line-of-sight and ground station packet parser implementation.</p>
+        `
+      },
+      {
+        id: 2,
+        weekNumber: 2,
+        dateRange: "Nov 01 – Nov 07, 2026",
+        status: "in-progress",
+        title: "LoRa Radio Telemetry & Ground Station Link",
+        summary: "Developing our 433MHz LoRa communication link, packet format with error checksums, and real-time laptop telemetry dashboard.",
+        image: "",
+        milestones: [
+          "SX1278 433MHz LoRa packet structure locked (1 Hz update rate)",
+          "WebSerial API ground station telemetry UI prototype",
+          "Directional Yagi antenna range testing scheduled"
+        ],
+        telemetry: {
+          mcu: "ESP32-S3",
+          radio: "SX1278 LoRa 433MHz",
+          groundStation: "WebSerial Dashboard",
+          packetRate: "1 Hz Telemetry"
+        },
+        fullReport: `
+          <h4>RF Communications Progress</h4>
+          <p>Reliable radio telemetry is critical for our mission score. We are encoding GPS coordinates, pitch/roll, barometric altitude, and battery voltage into lightweight binary packets with CRC checks.</p>
+        `
+      },
+      {
+        id: 3,
+        weekNumber: 3,
+        dateRange: "Nov 08 – Nov 14, 2026",
+        status: "upcoming",
+        title: "Mechanical Chassis CAD & 3D Printing Iteration 1",
+        summary: "Modeling the internal tiered mounting structure in CAD to withstand 20G launch shock and impact landing.",
+        image: "",
+        milestones: [
+          "SolidWorks / Fusion 360 internal chassis model",
+          "PETG vs Polycarbonate filament stress testing",
+          "Center-of-gravity and payload balance verification"
+        ],
+        telemetry: {
+          chassis: "3D Printed PETG Stack",
+          diameter: "66 mm cylinder",
+          height: "115 mm",
+          shockRating: "20G Impact Tolerance"
+        },
+        fullReport: `<p>Log will be posted once CAD models and 3D print prototypes are evaluated.</p>`
+      },
+      {
+        id: 4,
+        weekNumber: 4,
+        dateRange: "Nov 15 – Nov 21, 2026",
+        status: "upcoming",
+        title: "Parachute Aerodynamics & Deployment Mechanism",
+        summary: "Calculating terminal velocity (8-11 m/s target) and building the servo / nichrome wire release system.",
+        image: "",
+        milestones: [
+          "Canopy sizing calculations for 9.5 m/s terminal descent",
+          "Ripstop nylon cruciform parachute fabrication",
+          "Bench testing ejection deployment trigger"
+        ],
+        telemetry: {
+          canopy: "Cruciform Ripstop Nylon",
+          targetDescent: "9.5 m/s",
+          deployment: "Servo / Spring Ejector",
+          lines: "Braided Kevlar Suspension"
+        },
+        fullReport: `<p>Log will be updated following aerodynamic drop tests.</p>`
+      },
+      {
+        id: 5,
+        weekNumber: 5,
+        dateRange: "Nov 22 – Nov 28, 2026",
+        status: "upcoming",
+        title: "Sensor Fusion, Flight State Machine & SD Logging",
+        summary: "Implementing Kalman filtering for apogee detection and autonomous recovery state transitions.",
+        image: "",
+        milestones: [
+          "Flight state logic: IDLE -> LAUNCH -> APOGEE -> DESCENT -> LANDED",
+          "Dual SPI bus isolation for Flash + MicroSD card logging",
+          "IMU accelerometer launch threshold calibration"
+        ],
+        telemetry: {
+          filter: "1D Kalman Filter (Altitude)",
+          storage: "MicroSD FAT32 + Onboard Flash",
+          imu: "MPU6050 6-DOF Accelerometer",
+          stateRate: "50 Hz Update Loop"
+        },
+        fullReport: `<p>Log will be posted during software integration phase.</p>`
+      },
+      {
+        id: 6,
+        weekNumber: 6,
+        dateRange: "Nov 29 – Dec 05, 2026",
+        status: "upcoming",
+        title: "High-Altitude Drop Testing & Stress Analysis",
+        summary: "Field drop test from a drone at 150m to verify parachute deployment shock, live radio link, and recovery buzzer.",
+        image: "",
+        milestones: [
+          "Real-world drone release test at 150m AGL",
+          "Ground station packet capture and signal strength verification",
+          "Acoustic recovery buzzer audible range test"
+        ],
+        telemetry: {
+          testAlt: "150m Drop Height",
+          buzzer: "95dB Piezo Beacon",
+          rfMargin: "> 25 dB RSSI",
+          recoveryTime: "< 2 Minutes"
+        },
+        fullReport: `<p>Log will be published alongside high-altitude drop test footage and telemetry logs.</p>`
+      },
+      {
+        id: 7,
+        weekNumber: 7,
+        dateRange: "Dec 06 – Dec 12, 2026",
+        status: "upcoming",
+        title: "Final Integration, Critical Design Review & Launch Readiness",
+        summary: "Final weigh-in, hardware freeze, Critical Design Review (CDR) sign-off, and competition mission dossier.",
+        image: "",
+        milestones: [
+          "Final mass & volume compliance sign-off (315g / 350g limit)",
+          "4-hour continuous broadcast battery dry run",
+          "Mission readiness review checklist signed"
+        ],
+        telemetry: {
+          finalMass: "315 g",
+          status: "FLIGHT READY",
+          cdrScore: "Pending Review",
+          countdown: "T-0 to Launch"
+        },
+        fullReport: `<p>Final mission recap and launch day countdown.</p>`
+      }
+    ];
+
+    // Priority: localStorage (edited on device) -> external posts.js -> DEFAULT_SKYLINK_POSTS
+    let posts = DEFAULT_SKYLINK_POSTS;
+    try {
+      const cached = localStorage.getItem('skylink_posts');
+      if (cached) {
+        posts = JSON.parse(cached);
+      } else if (typeof SKYLINK_POSTS !== 'undefined') {
+        posts = SKYLINK_POSTS;
+      }
+    } catch (e) {
+      console.log('Using default posts');
+    }
+
+    let currentFilter = 'all';
+
+    // DOM Elements
+    const timelineContainer = document.getElementById('timelineContainer');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const logModal = document.getElementById('logModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const modalBadge = document.getElementById('modalBadge');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalDate = document.getElementById('modalDate');
+    const modalBody = document.getElementById('modalBody');
+
+    // Launch Day Countdown
+    function updateCountdown() {
+      const targetDate = new Date('December 12, 2026 09:00:00').getTime();
+      const now = new Date().getTime();
+      const diff = targetDate - now;
+
+      if (diff > 0) {
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        document.getElementById('days').textContent = String(days).padStart(2, '0');
+        document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+        document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+        document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+      } else {
+        document.getElementById('days').textContent = '00';
+        document.getElementById('hours').textContent = '00';
+        document.getElementById('minutes').textContent = '00';
+        document.getElementById('seconds').textContent = '00';
+      }
+    }
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    // Render Timeline Feed
+    function renderTimeline() {
+      if (!timelineContainer) return;
+      timelineContainer.innerHTML = '';
+
+      const filtered = posts.filter(post => {
+        if (currentFilter === 'all') return true;
+        return post.status === currentFilter;
+      });
+
+      if (filtered.length === 0) {
+        timelineContainer.innerHTML = `<p style="text-align:center; color: var(--text-dim); padding: 30px;">No logs found for this filter.</p>`;
+        return;
+      }
+
+      filtered.forEach(post => {
+        const card = document.createElement('article');
+        card.className = `log-card ${post.status}`;
+        card.setAttribute('data-id', post.id);
+
+        const statusLabel = post.status === 'published' ? 'PUBLISHED' : (post.status === 'in-progress' ? 'IN PROGRESS' : 'UPCOMING');
+        const statusClass = post.status;
+
+        const thumbHtml = post.image ? `
+          <div class="card-thumb-wrap">
+            <img src="${post.image}" alt="${escapeHtml(post.title)}" class="card-thumb-img" loading="lazy">
+          </div>
+        ` : '';
+
+        const milestonesHtml = post.milestones && post.milestones.length > 0
+          ? `<ul class="card-milestones">${post.milestones.slice(0, 3).map(m => `<li>${escapeHtml(m)}</li>`).join('')}</ul>`
+          : '';
+
+        card.innerHTML = `
+          <div class="card-top">
+            <span class="week-tag">WEEK 0${post.weekNumber}</span>
+            <span class="status-tag ${statusClass}">${statusLabel}</span>
+          </div>
+          <div class="card-date">${post.dateRange}</div>
+          <h3 class="card-title">${escapeHtml(post.title)}</h3>
+          ${thumbHtml}
+          <p class="card-summary">${escapeHtml(post.summary)}</p>
+          ${milestonesHtml}
+          <div class="card-footer">
+            <span class="card-action">
+              Read Mission Log
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </span>
+          </div>
+        `;
+
+        card.addEventListener('click', () => openModal(post));
+        timelineContainer.appendChild(card);
+      });
+    }
+
+    // Modal View
+    function openModal(post) {
+      modalBadge.textContent = `WEEK 0${post.weekNumber} • ${post.status.toUpperCase()}`;
+      modalTitle.textContent = post.title;
+      modalDate.textContent = post.dateRange;
+
+      let modalHtml = '';
+
+      if (post.image) {
+        modalHtml += `<img src="${post.image}" alt="${escapeHtml(post.title)}" class="modal-full-img">`;
+      }
+
+      if (post.telemetry && Object.keys(post.telemetry).length > 0) {
+        modalHtml += `<div class="telemetry-box">`;
+        for (const [key, val] of Object.entries(post.telemetry)) {
+          modalHtml += `<div class="telemetry-item"><span>${key.toUpperCase()}</span><strong>${escapeHtml(val)}</strong></div>`;
+        }
+        modalHtml += `</div>`;
+      }
+
+      modalHtml += post.fullReport || post.content || `<p>${escapeHtml(post.summary)}</p>`;
+
+      modalBody.innerHTML = modalHtml;
+      logModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      logModal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+    if (logModal) {
+      logModal.addEventListener('click', (e) => {
+        if (e.target === logModal) closeModal();
+      });
+    }
+
+    // Filters
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = btn.getAttribute('data-filter');
+        renderTimeline();
+      });
+    });
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // Initial Render
+    renderTimeline();
+  </script>
 </body>
 </html>

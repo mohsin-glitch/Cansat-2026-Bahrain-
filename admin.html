@@ -9,6 +9,61 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="admin.css">
+
+  <style>
+    /* Bulletproof Base Styles */
+    :root {
+      --bg: #06090f;
+      --card-bg: rgba(14, 20, 32, 0.85);
+      --card-border: rgba(0, 242, 254, 0.18);
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --cyan: #00f2fe;
+      --blue: #4facfe;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --font-main: 'Space Grotesk', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background-color: var(--bg); color: var(--text-main); font-family: var(--font-main); min-height: 100vh; line-height: 1.5; }
+    
+    .stars-bg {
+      position: fixed; inset: 0;
+      background-image: radial-gradient(1px 1px at 20px 30px, #fff, transparent), radial-gradient(1.2px 1.2px at 50px 80px, var(--cyan), transparent);
+      background-size: 200px 200px; opacity: 0.35; pointer-events: none; z-index: 0;
+    }
+
+    .login-wrapper { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; position: relative; z-index: 1; }
+    .login-card {
+      background: rgba(14, 20, 32, 0.95); backdrop-filter: blur(16px);
+      border: 1px solid rgba(0, 242, 254, 0.25); border-radius: 16px; padding: 36px 28px; width: 100%; max-width: 400px; text-align: center;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.8), 0 0 30px rgba(0, 242, 254, 0.1);
+    }
+    .lock-icon {
+      width: 58px; height: 58px; background: rgba(0, 242, 254, 0.1); color: var(--cyan);
+      border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;
+    }
+    .login-card h2 { font-size: 1.45rem; font-weight: 700; margin-bottom: 6px; }
+    .login-sub { color: var(--text-muted); font-size: 0.84rem; margin-bottom: 22px; line-height: 1.45; }
+    
+    .form-input {
+      width: 100%; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 8px; padding: 10px 12px; color: #fff; font-family: var(--font-main); font-size: 0.9rem; outline: none; margin-bottom: 12px;
+    }
+    .form-input:focus { border-color: var(--cyan); }
+    
+    .btn-primary {
+      width: 100%; background: linear-gradient(135deg, var(--cyan), var(--blue)); color: #040810;
+      border: none; border-radius: 8px; padding: 11px; font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; cursor: pointer;
+    }
+    .btn-primary:hover { filter: brightness(1.15); }
+    .auth-error { color: #ef4444; font-family: var(--font-mono); font-size: 0.78rem; margin-top: 10px; }
+    .back-link { display: inline-block; margin-top: 18px; color: var(--text-dim); text-decoration: none; font-family: var(--font-mono); font-size: 0.76rem; }
+    .back-link:hover { color: var(--cyan); }
+  </style>
 </head>
 <body class="admin-body">
 
@@ -153,7 +208,7 @@
 
           <!-- Instagram Summary Preview -->
           <label class="form-label">Quick Summary (Instagram Bio Link Preview)</label>
-          <textarea id="fSummary" class="form-input" rows="2" placeholder="Brief 1-2 sentence overview followers see before opening..."></textarea>
+          <textarea id="fSummary" class="form-input" rows="2" placeholder="Brief 1-2 sentence preview for your followers..."></textarea>
 
           <!-- Photo Uploading Section -->
           <div class="image-uploader-section">
