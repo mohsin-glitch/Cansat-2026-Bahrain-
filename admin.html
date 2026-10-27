@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Skylink Mission Control | Admin Dashboard</title>
+  <title>Skylink Mission Control | Author Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -14,28 +14,28 @@
 
   <div class="stars-bg"></div>
 
-  <!-- Secure Login Screen -->
+  <!-- Secure Authenticator Screen (SHA-256 Protected) -->
   <div id="loginScreen" class="login-wrapper">
     <div class="login-card">
       <div class="lock-icon">
-        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
           <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
         </svg>
       </div>
       <h2>Skylink Mission Control</h2>
-      <p class="login-sub">Enter author credentials to access the flight log editor.</p>
+      <p class="login-sub">Restricted author access. Enter administrator passcode to unlock weekly blog tools.</p>
       
-      <div class="login-form">
-        <input type="password" id="passcodeInput" placeholder="Enter passcode" class="form-input" autocomplete="current-password">
-        <button id="loginBtn" class="btn-primary">Authenticate</button>
+      <form id="authForm" class="login-form">
+        <input type="password" id="passcodeInput" placeholder="Enter passcode" class="form-input" autocomplete="current-password" required>
+        <button type="submit" id="loginBtn" class="btn-primary">Authenticate</button>
         <p id="loginError" class="auth-error"></p>
-      </div>
+      </form>
       <a href="index.html" class="back-link">← Return to Public Blog</a>
     </div>
   </div>
 
-  <!-- Full Admin Dashboard App -->
+  <!-- Admin Dashboard App -->
   <div id="dashboardApp" style="display: none;">
     
     <!-- Top Nav -->
@@ -43,18 +43,29 @@
       <div class="dash-nav-container">
         <div class="brand">
           <span class="live-pulse"></span>
-          <span class="brand-title">SKYLINK // MISSION CONTROL DASHBOARD</span>
+          <span class="brand-title">SKYLINK // AUTHOR DASHBOARD</span>
         </div>
         <div class="nav-actions">
           <button id="downloadTopBtn" class="btn-download-nav">📥 Download posts.js</button>
           <a href="index.html" target="_blank" class="pill-btn">View Live Blog ↗</a>
-          <button id="logoutBtn" class="pill-btn danger">Log Out</button>
+          <button id="logoutBtn" class="pill-btn danger">Lock Session</button>
         </div>
       </div>
     </header>
 
     <main class="dash-container">
       
+      <!-- Launch Countdown Status Bar in Dashboard -->
+      <section class="dash-timer-bar">
+        <div class="timer-meta">
+          <span class="pulse-dot"></span>
+          <span class="timer-caption">T-MINUS TO CANSAT 2026 LAUNCH DAY (DEC 12, 2026)</span>
+        </div>
+        <div class="dash-timer-display" id="dashCountdown">
+          <span id="dDays">--</span>d : <span id="dHours">--</span>h : <span id="dMinutes">--</span>m : <span id="dSeconds">--</span>s
+        </div>
+      </section>
+
       <!-- Metrics Overview -->
       <section class="metrics-grid">
         <div class="metric-card">
@@ -75,11 +86,11 @@
         </div>
       </section>
 
-      <!-- Action & Export Banner -->
+      <!-- Sync / Export Banner -->
       <section class="export-banner">
         <div>
-          <h3>💾 Sync & Publish Your Updates</h3>
-          <p class="text-dim">After writing updates or uploading images, click <strong>Download posts.js</strong> and replace the file on GitHub.</p>
+          <h3>💾 Ready to Publish Your Changes?</h3>
+          <p class="text-dim">Edits and uploaded photos are auto-saved locally. To update your live Instagram link, click <strong>Download posts.js</strong> and drop it into GitHub.</p>
         </div>
         <div class="banner-btns">
           <button id="downloadBannerBtn" class="btn-primary">📥 Download posts.js</button>
@@ -87,27 +98,27 @@
         </div>
       </section>
 
-      <!-- Weekly Logs Table / List -->
+      <!-- Weekly Logs List -->
       <div class="section-title-bar">
-        <h2>Weekly Flight Logs (7 Weeks)</h2>
+        <h2>Manage 7 Mission Weeks</h2>
         <span class="save-status-msg" id="globalStatus"></span>
       </div>
 
       <div class="posts-table" id="postsTable">
-        <!-- Rendered by JS -->
+        <!-- Injected by admin.js -->
       </div>
 
     </main>
 
   </div>
 
-  <!-- Full Rich Editor Modal (With Image Upload) -->
+  <!-- Advanced Post Editor Modal with Rich Writing Tools -->
   <div class="modal-overlay" id="editorModal">
     <div class="modal-content rich-editor-modal">
       <div class="modal-header">
         <div>
           <span class="modal-badge" id="editModalBadge">WEEK 01</span>
-          <h2 class="modal-title" id="editModalHeading">Edit Weekly Log</h2>
+          <h2 class="modal-title" id="editModalHeading">Mission Log Editor</h2>
         </div>
         <button class="close-modal" id="closeEditorBtn">&times;</button>
       </div>
@@ -116,6 +127,7 @@
         <form id="editorForm">
           <input type="hidden" id="editIndex">
 
+          <!-- Core Metadata Grid -->
           <div class="form-grid-3">
             <div>
               <label class="form-label">Week Number</label>
@@ -126,7 +138,7 @@
               <input type="text" id="fDates" class="form-input" placeholder="e.g. Oct 25 – Oct 31, 2026" required>
             </div>
             <div>
-              <label class="form-label">Status</label>
+              <label class="form-label">Publication Status</label>
               <select id="fStatus" class="form-input">
                 <option value="published">🟢 Published (Live for followers)</option>
                 <option value="in-progress">🟡 In Progress (Drafting)</option>
@@ -135,15 +147,17 @@
             </div>
           </div>
 
-          <label class="form-label">Milestone Headline / Title</label>
-          <input type="text" id="fTitle" class="form-input" placeholder="e.g. LoRa Telemetry Tested Over 1km" required>
+          <!-- Title -->
+          <label class="form-label">Post Title / Milestone Headline</label>
+          <input type="text" id="fTitle" class="form-input" placeholder="e.g. Flight Computer & LoRa Telemetry Benchmark" required>
 
-          <label class="form-label">Quick Summary (Instagram Feed Preview)</label>
-          <textarea id="fSummary" class="form-input" rows="2" placeholder="Brief 1-2 sentence preview for your followers..."></textarea>
+          <!-- Instagram Summary Preview -->
+          <label class="form-label">Quick Summary (Instagram Bio Link Preview)</label>
+          <textarea id="fSummary" class="form-input" rows="2" placeholder="Brief 1-2 sentence overview followers see before opening..."></textarea>
 
-          <!-- Image Upload System -->
+          <!-- Photo Uploading Section -->
           <div class="image-uploader-section">
-            <label class="form-label">📷 Upload Mission Photo / Diagram</label>
+            <label class="form-label">📷 Upload Mission Photo / Diagram / Hardware Prototype</label>
             <div class="upload-dropzone" id="dropZone">
               <input type="file" id="imageFileInput" accept="image/*" class="file-hidden-input">
               <div class="dropzone-prompt" id="dropPrompt">
@@ -152,31 +166,61 @@
                   <circle cx="8.5" cy="8.5" r="1.5"/>
                   <polyline points="21 15 16 10 5 21"/>
                 </svg>
-                <p>Click to select image, or drag & drop (PNG, JPG, WebP)</p>
+                <p><strong>Click to upload</strong> or drag and drop a photo (PNG, JPG, WebP)</p>
+                <small>Automatically compressed for ultra-fast loading on mobile</small>
               </div>
             </div>
             
-            <!-- Live Preview -->
             <div id="imagePreviewContainer" class="image-preview-wrapper" style="display: none;">
               <img id="imagePreview" src="" alt="Preview" class="preview-img">
               <button type="button" id="removeImageBtn" class="btn-remove-img">✕ Remove Photo</button>
             </div>
           </div>
 
+          <!-- Milestones Checklist -->
           <label class="form-label">Key Milestones Completed (One bullet per line)</label>
-          <textarea id="fMilestones" class="form-input" rows="3" placeholder="- Tested LoRa 433MHz module&#10;- 3D printed PETG chassis&#10;- Calibrated barometer"></textarea>
+          <textarea id="fMilestones" class="form-input" rows="3" placeholder="- Tested ESP32-S3 sensor polling rate&#10;- Printed PETG internal avionics tray&#10;- Calibrated BMP388 barometer"></textarea>
 
           <!-- Telemetry Specs Grid -->
-          <label class="form-label">Technical Telemetry Specs (Optional)</label>
+          <label class="form-label">Telemetry & Hardware Specs</label>
           <div class="form-grid-2">
             <input type="text" id="fTelemMcu" class="form-input" placeholder="MCU: e.g. ESP32-S3 (240MHz)">
             <input type="text" id="fTelemMass" class="form-input" placeholder="Mass: e.g. 315g / 350g max">
-            <input type="text" id="fTelemSensor" class="form-input" placeholder="Primary Sensor: e.g. BMP388 Barometer">
+            <input type="text" id="fTelemSensor" class="form-input" placeholder="Primary Sensor: e.g. BMP388 (±0.1m)">
             <input type="text" id="fTelemBattery" class="form-input" placeholder="Battery: e.g. 1S 3.7V 450mAh LiPo">
           </div>
 
-          <label class="form-label">Full Technical Debrief / Mission Article</label>
-          <textarea id="fFullReport" class="form-input code-area" rows="6" placeholder="Write full details about tests, lessons learned, and next week's flight goals..."></textarea>
+          <!-- Writing Tools Toolbar -->
+          <div class="writing-tools-header">
+            <label class="form-label" style="margin: 0;">Full Mission Debrief Article</label>
+            <div class="editor-tabs">
+              <button type="button" class="tab-btn active" id="tabWriteBtn">Write Mode</button>
+              <button type="button" class="tab-btn" id="tabPreviewBtn">Live Preview</button>
+            </div>
+          </div>
+
+          <!-- Formatting Toolbar -->
+          <div class="editor-toolbar" id="writingToolbar">
+            <button type="button" class="tool-btn" data-tool="bold" title="Bold"><b>B</b></button>
+            <button type="button" class="tool-btn" data-tool="italic" title="Italic"><i>I</i></button>
+            <button type="button" class="tool-btn" data-tool="h3" title="Heading 3">H3</button>
+            <button type="button" class="tool-btn" data-tool="h4" title="Subheading">H4</button>
+            <button type="button" class="tool-btn" data-tool="bullet" title="Bullet List">• List</button>
+            <button type="button" class="tool-btn" data-tool="number" title="Numbered List">1. List</button>
+            <button type="button" class="tool-btn" data-tool="callout" title="Highlight Callout">💬 Callout</button>
+            <button type="button" class="tool-btn" data-tool="code" title="Telemetry Code">&lt;/&gt;</button>
+            <button type="button" class="tool-btn highlight" id="insertTemplateBtn" title="Insert CanSat Weekly Template">⚡ Insert Template</button>
+          </div>
+
+          <!-- Textarea (Write Mode) -->
+          <div id="writePane">
+            <textarea id="fFullReport" class="form-input code-area" rows="8" placeholder="Write full details about your weekly engineering progress, what went right, what failed, and flight telemetry..."></textarea>
+          </div>
+
+          <!-- Live Preview Pane -->
+          <div id="previewPane" class="live-preview-box" style="display: none;">
+            <!-- Real-time formatted HTML rendered here -->
+          </div>
 
           <div class="modal-form-actions">
             <button type="submit" class="btn-primary" id="savePostBtn">Save Changes</button>
