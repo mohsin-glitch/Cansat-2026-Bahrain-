@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Skylink Admin | Edit 7 Weekly Logs</title>
+  <title>Skylink Mission Control | Admin Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -14,53 +14,177 @@
 
   <div class="stars-bg"></div>
 
-  <!-- Passcode Screen -->
+  <!-- Secure Login Screen -->
   <div id="loginScreen" class="login-wrapper">
     <div class="login-card">
       <div class="lock-icon">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
           <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
         </svg>
       </div>
-      <h2>Skylink Author Access</h2>
-      <p class="login-sub">Enter passcode to edit the 7 weekly logs.</p>
+      <h2>Skylink Mission Control</h2>
+      <p class="login-sub">Enter author credentials to access the flight log editor.</p>
       
       <div class="login-form">
-        <input type="password" id="passcodeInput" placeholder="Passcode (default: cansat2026)" class="form-input">
-        <button id="loginBtn" class="save-all-btn">Unlock</button>
+        <input type="password" id="passcodeInput" placeholder="Enter passcode" class="form-input" autocomplete="current-password">
+        <button id="loginBtn" class="btn-primary">Authenticate</button>
         <p id="loginError" class="auth-error"></p>
       </div>
       <a href="index.html" class="back-link">← Return to Public Blog</a>
     </div>
   </div>
 
-  <!-- Admin 7-Week Editor -->
+  <!-- Full Admin Dashboard App -->
   <div id="dashboardApp" style="display: none;">
     
-    <header class="admin-header">
-      <div class="admin-header-content">
-        <div>
-          <h1 class="admin-brand">SKYLINK // AUTHOR DASHBOARD</h1>
-          <p class="admin-sub">Edit the 7 weekly logs below. When finished, click <strong>Download posts.js</strong> and drop it into GitHub!</p>
+    <!-- Top Nav -->
+    <header class="dash-nav">
+      <div class="dash-nav-container">
+        <div class="brand">
+          <span class="live-pulse"></span>
+          <span class="brand-title">SKYLINK // MISSION CONTROL DASHBOARD</span>
         </div>
-        <div class="header-buttons">
-          <button id="downloadTopBtn" class="download-pill">📥 Download posts.js</button>
-          <a href="index.html" target="_blank" class="nav-pill">View Public Blog ↗</a>
+        <div class="nav-actions">
+          <button id="downloadTopBtn" class="btn-download-nav">📥 Download posts.js</button>
+          <a href="index.html" target="_blank" class="pill-btn">View Live Blog ↗</a>
+          <button id="logoutBtn" class="pill-btn danger">Log Out</button>
         </div>
       </div>
     </header>
 
-    <main class="editor-container" id="editorContainer">
-      <!-- 7 Week Editor Cards Injected by JS -->
+    <main class="dash-container">
+      
+      <!-- Metrics Overview -->
+      <section class="metrics-grid">
+        <div class="metric-card">
+          <span class="metric-label">TOTAL MISSION WEEKS</span>
+          <span class="metric-num" id="totalWeeksNum">7</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">PUBLISHED</span>
+          <span class="metric-num emerald" id="pubNum">1</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">IN PROGRESS</span>
+          <span class="metric-num amber" id="progNum">1</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">UPCOMING / LOCKED</span>
+          <span class="metric-num dim" id="upNum">5</span>
+        </div>
+      </section>
+
+      <!-- Action & Export Banner -->
+      <section class="export-banner">
+        <div>
+          <h3>💾 Sync & Publish Your Updates</h3>
+          <p class="text-dim">After writing updates or uploading images, click <strong>Download posts.js</strong> and replace the file on GitHub.</p>
+        </div>
+        <div class="banner-btns">
+          <button id="downloadBannerBtn" class="btn-primary">📥 Download posts.js</button>
+          <button id="copyCodeBtn" class="btn-secondary">📋 Copy Code</button>
+        </div>
+      </section>
+
+      <!-- Weekly Logs Table / List -->
+      <div class="section-title-bar">
+        <h2>Weekly Flight Logs (7 Weeks)</h2>
+        <span class="save-status-msg" id="globalStatus"></span>
+      </div>
+
+      <div class="posts-table" id="postsTable">
+        <!-- Rendered by JS -->
+      </div>
+
     </main>
 
-    <div class="bottom-action-bar">
-      <button id="downloadBottomBtn" class="save-all-btn">📥 Download Updated posts.js</button>
-      <button id="copyCodeBtn" class="copy-pill">📋 Copy Code to Clipboard</button>
-      <p id="saveNotice" class="save-notice"></p>
-    </div>
+  </div>
 
+  <!-- Full Rich Editor Modal (With Image Upload) -->
+  <div class="modal-overlay" id="editorModal">
+    <div class="modal-content rich-editor-modal">
+      <div class="modal-header">
+        <div>
+          <span class="modal-badge" id="editModalBadge">WEEK 01</span>
+          <h2 class="modal-title" id="editModalHeading">Edit Weekly Log</h2>
+        </div>
+        <button class="close-modal" id="closeEditorBtn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="editorForm">
+          <input type="hidden" id="editIndex">
+
+          <div class="form-grid-3">
+            <div>
+              <label class="form-label">Week Number</label>
+              <input type="number" id="fWeekNum" class="form-input" min="1" max="7" readonly>
+            </div>
+            <div>
+              <label class="form-label">Date Range</label>
+              <input type="text" id="fDates" class="form-input" placeholder="e.g. Oct 25 – Oct 31, 2026" required>
+            </div>
+            <div>
+              <label class="form-label">Status</label>
+              <select id="fStatus" class="form-input">
+                <option value="published">🟢 Published (Live for followers)</option>
+                <option value="in-progress">🟡 In Progress (Drafting)</option>
+                <option value="upcoming">⚪ Upcoming (Locked)</option>
+              </select>
+            </div>
+          </div>
+
+          <label class="form-label">Milestone Headline / Title</label>
+          <input type="text" id="fTitle" class="form-input" placeholder="e.g. LoRa Telemetry Tested Over 1km" required>
+
+          <label class="form-label">Quick Summary (Instagram Feed Preview)</label>
+          <textarea id="fSummary" class="form-input" rows="2" placeholder="Brief 1-2 sentence preview for your followers..."></textarea>
+
+          <!-- Image Upload System -->
+          <div class="image-uploader-section">
+            <label class="form-label">📷 Upload Mission Photo / Diagram</label>
+            <div class="upload-dropzone" id="dropZone">
+              <input type="file" id="imageFileInput" accept="image/*" class="file-hidden-input">
+              <div class="dropzone-prompt" id="dropPrompt">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <polyline points="21 15 16 10 5 21"/>
+                </svg>
+                <p>Click to select image, or drag & drop (PNG, JPG, WebP)</p>
+              </div>
+            </div>
+            
+            <!-- Live Preview -->
+            <div id="imagePreviewContainer" class="image-preview-wrapper" style="display: none;">
+              <img id="imagePreview" src="" alt="Preview" class="preview-img">
+              <button type="button" id="removeImageBtn" class="btn-remove-img">✕ Remove Photo</button>
+            </div>
+          </div>
+
+          <label class="form-label">Key Milestones Completed (One bullet per line)</label>
+          <textarea id="fMilestones" class="form-input" rows="3" placeholder="- Tested LoRa 433MHz module&#10;- 3D printed PETG chassis&#10;- Calibrated barometer"></textarea>
+
+          <!-- Telemetry Specs Grid -->
+          <label class="form-label">Technical Telemetry Specs (Optional)</label>
+          <div class="form-grid-2">
+            <input type="text" id="fTelemMcu" class="form-input" placeholder="MCU: e.g. ESP32-S3 (240MHz)">
+            <input type="text" id="fTelemMass" class="form-input" placeholder="Mass: e.g. 315g / 350g max">
+            <input type="text" id="fTelemSensor" class="form-input" placeholder="Primary Sensor: e.g. BMP388 Barometer">
+            <input type="text" id="fTelemBattery" class="form-input" placeholder="Battery: e.g. 1S 3.7V 450mAh LiPo">
+          </div>
+
+          <label class="form-label">Full Technical Debrief / Mission Article</label>
+          <textarea id="fFullReport" class="form-input code-area" rows="6" placeholder="Write full details about tests, lessons learned, and next week's flight goals..."></textarea>
+
+          <div class="modal-form-actions">
+            <button type="submit" class="btn-primary" id="savePostBtn">Save Changes</button>
+            <button type="button" class="btn-secondary" id="saveAndDownloadBtn">Save & Download posts.js</button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 
   <script src="posts.js"></script>

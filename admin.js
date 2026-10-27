@@ -1,119 +1,294 @@
-// Skylink Admin Engine - Simple 7-Week Editor
+// Skylink Mission Control Engine
 
-const DEFAULT_PASS = 'cansat2026';
+// SECURE AUTHOR PASSCODE (Strictly confidential - no hints in UI)
+const AUTHOR_HASH = 'Maf2211';
 
-let skylinkData = typeof SKYLINK_POSTS !== 'undefined' ? SKYLINK_POSTS : [];
-
-// Check localStorage for drafted edits
+// Load initial posts
+let adminPosts = [];
 try {
   const cached = localStorage.getItem('skylink_posts');
-  if (cached) skylinkData = JSON.parse(cached);
+  adminPosts = cached ? JSON.parse(cached) : (typeof SKYLINK_POSTS !== 'undefined' ? SKYLINK_POSTS : []);
 } catch (e) {
-  console.log('Using default data');
+  adminPosts = typeof SKYLINK_POSTS !== 'undefined' ? SKYLINK_POSTS : [];
 }
 
+let activeEditIndex = null;
+let currentImageData = '';
+
+// DOM Elements
 const loginScreen = document.getElementById('loginScreen');
 const dashboardApp = document.getElementById('dashboardApp');
 const passcodeInput = document.getElementById('passcodeInput');
 const loginBtn = document.getElementById('loginBtn');
 const loginError = document.getElementById('loginError');
-const editorContainer = document.getElementById('editorContainer');
-const downloadTopBtn = document.getElementById('downloadTopBtn');
-const downloadBottomBtn = document.getElementById('downloadBottomBtn');
-const copyCodeBtn = document.getElementById('copyCodeBtn');
-const saveNotice = document.getElementById('saveNotice');
+const logoutBtn = document.getElementById('logoutBtn');
 
-// Check Session
-if (sessionStorage.getItem('skylink_admin_auth') === 'true') {
-  showDashboard();
+// Dashboard Elements
+const totalWeeksNum = document.getElementById('totalWeeksNum');
+const pubNum = document.getElementById('pubNum');
+const progNum = document.getElementById('progNum');
+const upNum = document.getElementById('upNum');
+const postsTable = document.getElementById('postsTable');
+const globalStatus = document.getElementById('globalStatus');
+
+const downloadTopBtn = document.getElementById('downloadTopBtn');
+const downloadBannerBtn = document.getElementById('downloadBannerBtn');
+const copyCodeBtn = document.getElementById('copyCodeBtn');
+
+// Modal Elements
+const editorModal = document.getElementById('editorModal');
+const closeEditorBtn = document.getElementById('closeEditorBtn');
+const editModalBadge = document.getElementById('editModalBadge');
+const editModalHeading = document.getElementById('editModalHeading');
+const editorForm = document.getElementById('editorForm');
+
+const fWeekNum = document.getElementById('fWeekNum');
+const fDates = document.getElementById('fDates');
+const fStatus = document.getElementById('fStatus');
+const fTitle = document.getElementById('fTitle');
+const fSummary = document.getElementById('fSummary');
+const fMilestones = document.getElementById('fMilestones');
+const fTelemMcu = document.getElementById('fTelemMcu');
+const fTelemMass = document.getElementById('fTelemMass');
+const fTelemSensor = document.getElementById('fTelemSensor');
+const fTelemBattery = document.getElementById('fTelemBattery');
+const fFullReport = document.getElementById('fFullReport');
+
+// Image upload DOM
+const imageFileInput = document.getElementById('imageFileInput');
+const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+const imagePreview = document.getElementById('imagePreview');
+const removeImageBtn = document.getElementById('removeImageBtn');
+const dropPrompt = document.getElementById('dropPrompt');
+
+const saveAndDownloadBtn = document.getElementById('saveAndDownloadBtn');
+
+// Check Session Authentication
+if (sessionStorage.getItem('skylink_admin_authenticated') === 'true') {
+  unlockDashboard();
 }
 
-loginBtn.addEventListener('click', handleAuth);
+loginBtn.addEventListener('click', attemptLogin);
 passcodeInput.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') handleAuth();
+  if (e.key === 'Enter') attemptLogin();
 });
 
-function handleAuth() {
+function attemptLogin() {
   const entered = passcodeInput.value.trim();
-  if (entered === DEFAULT_PASS || entered === 'admin') {
-    sessionStorage.setItem('skylink_admin_auth', 'true');
-    showDashboard();
+  if (entered === AUTHOR_HASH) {
+    sessionStorage.setItem('skylink_admin_authenticated', 'true');
+    unlockDashboard();
   } else {
-    loginError.textContent = 'Incorrect passcode. Try: cansat2026';
+    // Strictly generic error message without any hints
+    loginError.textContent = 'Access Denied: Invalid passcode.';
+    passcodeInput.value = '';
+    passcodeInput.focus();
   }
 }
 
-function showDashboard() {
+logoutBtn.addEventListener('click', () => {
+  sessionStorage.removeItem('skylink_admin_authenticated');
+  dashboardApp.style.display = 'none';
+  loginScreen.style.display = 'flex';
+  passcodeInput.value = '';
+  loginError.textContent = '';
+});
+
+function unlockDashboard() {
   loginScreen.style.display = 'none';
   dashboardApp.style.display = 'block';
-  renderEditorCards();
+  renderDashboard();
 }
 
-// Render the 7 Week Editor Cards
-function renderEditorCards() {
-  editorContainer.innerHTML = '';
+// Render Dashboard
+function renderDashboard() {
+  totalWeeksNum.textContent = adminPosts.length;
+  pubNum.textContent = adminPosts.filter(p => p.status === 'published').length;
+  progNum.textContent = adminPosts.filter(p => p.status === 'in-progress').length;
+  upNum.textContent = adminPosts.filter(p => p.status === 'upcoming').length;
 
-  skylinkData.forEach((post, index) => {
-    const card = document.createElement('div');
-    card.className = 'week-card';
+  postsTable.innerHTML = '';
 
-    card.innerHTML = `
-      <div class="card-header-bar">
-        <div>
-          <span class="card-week-title">WEEK 0${post.week}</span>
-          <span class="card-dates-sub"> • ${post.dates}</span>
+  adminPosts.forEach((post, index) => {
+    const row = document.createElement('div');
+    row.className = 'admin-week-row';
+
+    const statusBadgeClass = post.status;
+    const statusLabel = post.status === 'published' ? 'PUBLISHED' : (post.status === 'in-progress' ? 'IN PROGRESS' : 'UPCOMING');
+
+    // Thumbnail
+    const thumbHtml = post.image 
+      ? `<img src="${post.image}" alt="Thumb" class="row-thumb">`
+      : '';
+
+    row.innerHTML = `
+      <div class="row-left">
+        <span class="row-week-tag">WEEK 0${post.weekNumber}</span>
+        ${thumbHtml}
+        <div class="row-details">
+          <h4>${escapeHtml(post.title)}</h4>
+          <div class="row-meta">
+            <span>📅 ${post.dateRange}</span>
+            <span class="status-tag ${statusBadgeClass}">${statusLabel}</span>
+          </div>
         </div>
-        <select class="form-input" style="width: auto; margin-bottom: 0;" onchange="updateStatus(${index}, this.value)">
-          <option value="published" ${post.status === 'published' ? 'selected' : ''}>🟢 Published (Live)</option>
-          <option value="in-progress" ${post.status === 'in-progress' ? 'selected' : ''}>🟡 In Progress (Draft)</option>
-          <option value="upcoming" ${post.status === 'upcoming' ? 'selected' : ''}>⚪ Upcoming (Locked)</option>
-        </select>
       </div>
-
-      <label class="field-label">Week Headline / Title</label>
-      <input type="text" class="form-input" value="${escapeAttr(post.title)}" oninput="updateTitle(${index}, this.value)">
-
-      <label class="field-label">Weekly Engineering Log (What you worked on)</label>
-      <textarea class="textarea-input" oninput="updateContent(${index}, this.value)">${escapeText(post.content)}</textarea>
+      <div class="row-right">
+        <button class="btn-edit" onclick="openWeekEditor(${index})">✏️ Edit Log</button>
+      </div>
     `;
 
-    editorContainer.appendChild(card);
+    postsTable.appendChild(row);
   });
 }
 
-// Live update helpers
-window.updateStatus = function(index, value) {
-  skylinkData[index].status = value;
-  persist();
-};
+// Open Week Editor
+window.openWeekEditor = function(index) {
+  activeEditIndex = index;
+  const post = adminPosts[index];
+  if (!post) return;
 
-window.updateTitle = function(index, value) {
-  skylinkData[index].title = value;
-  persist();
-};
+  editModalBadge.textContent = `WEEK 0${post.weekNumber}`;
+  editModalHeading.textContent = `Edit Week 0${post.weekNumber} Log`;
 
-window.updateContent = function(index, value) {
-  skylinkData[index].content = value;
-  persist();
-};
+  fWeekNum.value = post.weekNumber;
+  fDates.value = post.dateRange;
+  fStatus.value = post.status;
+  fTitle.value = post.title;
+  fSummary.value = post.summary || '';
+  fMilestones.value = (post.milestones || []).join('\n');
+  fFullReport.value = post.fullReport || '';
 
-function persist() {
-  try {
-    localStorage.setItem('skylink_posts', JSON.stringify(skylinkData));
-    showNotice('Auto-saved to device!');
-  } catch (e) {
-    console.error(e);
+  // Telemetry
+  const telem = post.telemetry || {};
+  fTelemMcu.value = telem.mcu || telem.chassis || '';
+  fTelemMass.value = telem.targetMass || telem.finalMass || '';
+  fTelemSensor.value = telem.altimeter || telem.sensor || '';
+  fTelemBattery.value = telem.battery || telem.radio || '';
+
+  // Image
+  currentImageData = post.image || '';
+  if (currentImageData) {
+    imagePreview.src = currentImageData;
+    imagePreviewContainer.style.display = 'block';
+    dropPrompt.style.display = 'none';
+  } else {
+    imagePreview.src = '';
+    imagePreviewContainer.style.display = 'none';
+    dropPrompt.style.display = 'block';
   }
+
+  editorModal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+};
+
+// Close Modal
+function closeEditor() {
+  editorModal.classList.remove('active');
+  document.body.style.overflow = '';
+}
+closeEditorBtn.addEventListener('click', closeEditor);
+
+// Image File Upload & Web-Optimized Compression via Canvas
+imageFileInput.addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    const rawUrl = evt.target.result;
+    
+    // Compress image to ensure lightweight storage
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const MAX_WIDTH = 1000;
+      let width = img.width;
+      let height = img.height;
+
+      if (width > MAX_WIDTH) {
+        height *= MAX_WIDTH / width;
+        width = MAX_WIDTH;
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+
+      currentImageData = canvas.toDataURL('image/jpeg', 0.82);
+      imagePreview.src = currentImageData;
+      imagePreviewContainer.style.display = 'block';
+      dropPrompt.style.display = 'none';
+    };
+    img.src = rawUrl;
+  };
+  reader.readAsDataURL(file);
+});
+
+// Remove Image
+removeImageBtn.addEventListener('click', () => {
+  currentImageData = '';
+  imagePreview.src = '';
+  imagePreviewContainer.style.display = 'none';
+  dropPrompt.style.display = 'block';
+  imageFileInput.value = '';
+});
+
+// Save Changes
+editorForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  saveCurrentFormData();
+  closeEditor();
+  showGlobalStatus('✓ Week updated successfully!');
+});
+
+saveAndDownloadBtn.addEventListener('click', () => {
+  saveCurrentFormData();
+  closeEditor();
+  downloadPostsJs();
+});
+
+function saveCurrentFormData() {
+  if (activeEditIndex === null) return;
+
+  const milestones = fMilestones.value
+    .split('\n')
+    .map(s => s.trim())
+    .filter(s => s.length > 0);
+
+  const telem = {};
+  if (fTelemMcu.value.trim()) telem.mcu = fTelemMcu.value.trim();
+  if (fTelemMass.value.trim()) telem.targetMass = fTelemMass.value.trim();
+  if (fTelemSensor.value.trim()) telem.altimeter = fTelemSensor.value.trim();
+  if (fTelemBattery.value.trim()) telem.battery = fTelemBattery.value.trim();
+
+  adminPosts[activeEditIndex].dateRange = fDates.value;
+  adminPosts[activeEditIndex].status = fStatus.value;
+  adminPosts[activeEditIndex].title = fTitle.value;
+  adminPosts[activeEditIndex].summary = fSummary.value;
+  adminPosts[activeEditIndex].image = currentImageData;
+  adminPosts[activeEditIndex].milestones = milestones;
+  adminPosts[activeEditIndex].telemetry = telem;
+  adminPosts[activeEditIndex].fullReport = fFullReport.value;
+
+  try {
+    localStorage.setItem('skylink_posts', JSON.stringify(adminPosts));
+  } catch (err) {
+    console.error('Storage error', err);
+  }
+
+  renderDashboard();
 }
 
-function showNotice(msg) {
-  saveNotice.textContent = msg;
-  setTimeout(() => { saveNotice.textContent = ''; }, 2500);
+function showGlobalStatus(msg) {
+  globalStatus.textContent = msg;
+  setTimeout(() => { globalStatus.textContent = ''; }, 3000);
 }
 
-// Download Updated posts.js
-function triggerDownload() {
-  const content = "// SKYLINK CanSat 2026 Weekly Blog Data\nconst SKYLINK_POSTS = " + JSON.stringify(skylinkData, null, 2) + ";\n";
+// Download File
+function downloadPostsJs() {
+  const content = "// SKYLINK - CanSat 2026 Official Mission Data\nconst SKYLINK_POSTS = " + JSON.stringify(adminPosts, null, 2) + ";\n";
   const blob = new Blob([content], { type: 'text/javascript' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -121,26 +296,23 @@ function triggerDownload() {
   document.body.appendChild(a);
   a.click();
   a.remove();
-  showNotice('Downloaded posts.js! Drop it into GitHub to update.');
+  showGlobalStatus('📥 Downloaded posts.js! Replace this file on GitHub.');
 }
 
-downloadTopBtn.addEventListener('click', triggerDownload);
-downloadBottomBtn.addEventListener('click', triggerDownload);
+downloadTopBtn.addEventListener('click', downloadPostsJs);
+downloadBannerBtn.addEventListener('click', downloadPostsJs);
 
-// Copy Code to Clipboard
+// Copy Code
 copyCodeBtn.addEventListener('click', () => {
-  const content = "// SKYLINK CanSat 2026 Weekly Blog Data\nconst SKYLINK_POSTS = " + JSON.stringify(skylinkData, null, 2) + ";\n";
+  const content = "// SKYLINK - CanSat 2026 Official Mission Data\nconst SKYLINK_POSTS = " + JSON.stringify(adminPosts, null, 2) + ";\n";
   navigator.clipboard.writeText(content).then(() => {
-    showNotice('✓ Copied to clipboard! Ready to paste into GitHub.');
+    showGlobalStatus('📋 Copied posts.js code to clipboard!');
   }).catch(() => {
-    alert('Could not auto-copy. Use Download button instead.');
+    alert('Copy failed. Use the Download button instead.');
   });
 });
 
-function escapeAttr(str) {
-  return (str || '').replace(/"/g, '&quot;');
-}
-
-function escapeText(str) {
-  return str || '';
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }

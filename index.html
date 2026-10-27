@@ -4,77 +4,130 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>SKYLINK | CanSat 2026 Weekly Blog</title>
-  <meta name="description" content="Official weekly engineering blog for Team Skylink (CanSat 2026).">
-  <!-- Clean Space Grotesk & Mono Fonts -->
+  <meta name="description" content="Official weekly engineering & flight blog for Team Skylink (CanSat 2026).">
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Ambient Space Glow -->
+  <!-- Ambient Space Background Glow -->
   <div class="stars-bg"></div>
-  <div class="glow-orb"></div>
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
 
-  <div class="app-wrapper">
+  <div class="container">
     
-    <!-- Profile & Header -->
-    <header class="header">
-      <div class="badge">
-        <span class="live-dot"></span>
-        <span>CANSAT 2026 • OFFICIAL LOG</span>
+    <!-- Top Header -->
+    <header class="profile-header">
+      <div class="mission-badge">
+        <span class="live-pulse"></span>
+        <span class="badge-text">MISSION STATUS: ACTIVE FLIGHT DEV</span>
       </div>
 
-      <div class="logo-box">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="9"/>
-          <path d="M12 3v6"/>
-          <path d="M12 15v6"/>
-          <path d="M3 12h6"/>
-          <path d="M15 12h6"/>
-          <circle cx="12" cy="12" r="3" fill="currentColor"/>
-        </svg>
+      <div class="avatar-wrapper">
+        <div class="avatar-ring">
+          <div class="avatar-inner">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="12" cy="12" r="9"/>
+              <path d="M12 3v6"/>
+              <path d="M12 15v6"/>
+              <path d="M3 12h6"/>
+              <path d="M15 12h6"/>
+              <circle cx="12" cy="12" r="3" fill="currentColor"/>
+            </svg>
+          </div>
+        </div>
       </div>
 
       <h1 class="team-title">SKYLINK</h1>
-      <p class="team-subtitle">Weekly Flight & Engineering Blog</p>
-      <p class="timeline-date">October 25 – December 12, 2026</p>
+      <p class="mission-subtitle">Weekly Flight & Engineering Blog</p>
+      <p class="mission-bio">
+        Documenting our 7-week CanSat 2026 journey from blueprint to launch. Follow our sensors, mechanical build, telemetry testing, and descent recovery.
+      </p>
+
+      <!-- Stats Bar -->
+      <div class="stats-bar">
+        <div class="stat-card">
+          <span class="stat-label">TIMELINE</span>
+          <span class="stat-val">7 WEEKS</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">START</span>
+          <span class="stat-val">OCT 25</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">LAUNCH / DEADLINE</span>
+          <span class="stat-val">DEC 12</span>
+        </div>
+      </div>
+
+      <!-- Live T-Minus Countdown -->
+      <div class="countdown-container">
+        <div class="countdown-header">
+          <span class="cd-title">T-MINUS TO FINAL INTEGRATION (DEC 12, 2026)</span>
+        </div>
+        <div class="countdown-grid" id="countdownGrid">
+          <div class="cd-block"><span id="days">--</span><label>DAYS</label></div>
+          <div class="cd-block"><span id="hours">--</span><label>HRS</label></div>
+          <div class="cd-block"><span id="minutes">--</span><label>MIN</label></div>
+          <div class="cd-block"><span id="seconds">--</span><label>SEC</label></div>
+        </div>
+      </div>
     </header>
 
-    <!-- The 7 Week Buttons -->
-    <main class="weeks-container" id="weeksList">
-      <!-- 7 Buttons rendered by app.js -->
+    <!-- Navigation Filters -->
+    <nav class="filter-nav">
+      <button class="filter-btn active" data-filter="all">All Logs (7)</button>
+      <button class="filter-btn" data-filter="published">Published</button>
+      <button class="filter-btn" data-filter="upcoming">Upcoming</button>
+    </nav>
+
+    <!-- 7 Week Buttons / Cards List -->
+    <main class="timeline-container" id="timelineContainer">
+      <!-- Injected by app.js -->
     </main>
 
-    <!-- Simple Footer -->
-    <footer class="footer">
-      <div class="footer-links">
-        <a href="https://instagram.com" target="_blank" rel="noopener" class="footer-btn">
-          Instagram ↗
+    <!-- Footer -->
+    <footer class="page-footer">
+      <div class="insta-links">
+        <a href="https://instagram.com" target="_blank" rel="noopener" class="pill-link">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+          </svg>
+          Back to Instagram
         </a>
-        <a href="admin.html" class="footer-btn admin">
-          ⚙️ Admin Edit
+        <a href="admin.html" class="pill-link admin-trigger">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          Author Access
         </a>
       </div>
-      <p class="footer-copy">Team Skylink • CanSat 2026</p>
+      <p class="copyright">Team Skylink • CanSat 2026</p>
     </footer>
 
   </div>
 
-  <!-- Weekly Log Modal -->
-  <div class="modal-overlay" id="readModal">
-    <div class="modal-box">
+  <!-- Detailed Modal Viewer -->
+  <div class="modal-overlay" id="logModal">
+    <div class="modal-content">
       <div class="modal-header">
         <div>
-          <span class="modal-week-tag" id="modalTag">WEEK 01</span>
-          <h2 class="modal-heading" id="modalHeading">Title</h2>
-          <span class="modal-subdate" id="modalDates">Dates</span>
+          <span class="modal-badge" id="modalBadge">WEEK 01</span>
+          <h2 class="modal-title" id="modalTitle">Title</h2>
+          <span class="modal-date" id="modalDate">Dates</span>
         </div>
-        <button class="modal-close-btn" id="closeModalBtn">&times;</button>
+        <button class="close-modal" id="closeModalBtn">&times;</button>
       </div>
-      <div class="modal-content-text" id="modalContent">
-        <!-- Text rendered by JS -->
+
+      <div class="modal-body" id="modalBody">
+        <!-- Rendered by app.js -->
       </div>
     </div>
   </div>
