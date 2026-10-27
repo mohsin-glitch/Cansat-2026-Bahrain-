@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skylink Admin | Edit 7 Weekly Logs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body class="admin-body">
+
+  <div class="stars-bg"></div>
+
+  <!-- Passcode Screen -->
+  <div id="loginScreen" class="login-wrapper">
+    <div class="login-card">
+      <div class="lock-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+      <h2>Skylink Author Access</h2>
+      <p class="login-sub">Enter passcode to edit the 7 weekly logs.</p>
+      
+      <div class="login-form">
+        <input type="password" id="passcodeInput" placeholder="Passcode (default: cansat2026)" class="form-input">
+        <button id="loginBtn" class="save-all-btn">Unlock</button>
+        <p id="loginError" class="auth-error"></p>
+      </div>
+      <a href="index.html" class="back-link">← Return to Public Blog</a>
+    </div>
+  </div>
+
+  <!-- Admin 7-Week Editor -->
+  <div id="dashboardApp" style="display: none;">
+    
+    <header class="admin-header">
+      <div class="admin-header-content">
+        <div>
+          <h1 class="admin-brand">SKYLINK // AUTHOR DASHBOARD</h1>
+          <p class="admin-sub">Edit the 7 weekly logs below. When finished, click <strong>Download posts.js</strong> and drop it into GitHub!</p>
+        </div>
+        <div class="header-buttons">
+          <button id="downloadTopBtn" class="download-pill">📥 Download posts.js</button>
+          <a href="index.html" target="_blank" class="nav-pill">View Public Blog ↗</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="editor-container" id="editorContainer">
+      <!-- 7 Week Editor Cards Injected by JS -->
+    </main>
+
+    <div class="bottom-action-bar">
+      <button id="downloadBottomBtn" class="save-all-btn">📥 Download Updated posts.js</button>
+      <button id="copyCodeBtn" class="copy-pill">📋 Copy Code to Clipboard</button>
+      <p id="saveNotice" class="save-notice"></p>
+    </div>
+
+  </div>
+
+  <script src="posts.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
